@@ -38,33 +38,66 @@ app.use(bodyParser.json());
 //   res.json(newUrl);
 // });
 
-// Route to shorten URL with optional alias
+// // Route to shorten URL with optional alias
+// app.post("/shorten", async (req, res) => {
+//     const { originalUrl, alias } = req.body;
+
+//     try {
+//         // Check if alias is provided and already exists
+//         if (alias) {
+//             const existingAlias = await Url.findOne({ shortUrl: alias });
+//             if (existingAlias) {
+//                 return res.status(400).json({ error: "Alias already in use. Please choose another one." });
+//             }
+//         }
+
+//         // Use alias if provided, otherwise generate a random short URL
+//         const shortUrl = alias || shortid.generate();
+
+//         // Create and save new URL
+//         const newUrl = new Url({ originalUrl, shortUrl });
+//         await newUrl.save();
+
+//         console.log("New short URL created:", newUrl); // Debugging
+//         res.json(newUrl);
+//     } catch (err) {
+//         console.error("Error creating short URL:", err);
+//         res.status(500).json({ error: "Internal server error" });
+//     }
+// });
+
 app.post("/shorten", async (req, res) => {
-    const { originalUrl, alias } = req.body;
+    const { originalUrl, alias, domain } = req.body;
 
     try {
+        // Validate the domain
+        if (!["shotme.cc", "smad.cc"].includes(domain)) {
+            return res.status(400).json({ error: "Invalid domain selected." });
+        }
+
         // Check if alias is provided and already exists
         if (alias) {
-            const existingAlias = await Url.findOne({ shortUrl: alias });
+            const existingAlias = await Url.findOne({ shortUrl: `${domain}/${alias}` });
             if (existingAlias) {
                 return res.status(400).json({ error: "Alias already in use. Please choose another one." });
             }
         }
 
         // Use alias if provided, otherwise generate a random short URL
-        const shortUrl = alias || shortid.generate();
+        const shortPath = alias || shortid.generate();
+        const shortUrl = `${domain}/${shortPath}`;
 
         // Create and save new URL
         const newUrl = new Url({ originalUrl, shortUrl });
         await newUrl.save();
 
-        console.log("New short URL created:", newUrl); // Debugging
-        res.json(newUrl);
+        res.json({ shortUrl: `http://${shortUrl}` });
     } catch (err) {
         console.error("Error creating short URL:", err);
         res.status(500).json({ error: "Internal server error" });
     }
 });
+
 
 
 
