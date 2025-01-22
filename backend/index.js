@@ -5,7 +5,7 @@ const cors = require("cors");
 const shortid = require("shortid");
 
 const app = express();
-const PORT = 5000;
+const PORT = 10000;
 
 // MongoDB connection
 mongoose.connect("mongodb+srv://rahulvb27:QhVxdVXegfJQrthF@r1cluster27.cel5auk.mongodb.net/test", {
