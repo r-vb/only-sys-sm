@@ -27,6 +27,12 @@ app.use(cors({
     allowedHeaders: ["Content-Type"],
 }));
 
+// Middleware to set CSP headers for image loading
+app.use((req, res, next) => {
+    res.setHeader("Content-Security-Policy", "default-src 'none'; img-src 'self' data:");
+    next();
+});
+
 // API Endpoint for URL shortening
 app.post("/shorten", async (req, res) => {
     const { originalUrl, alias, domain } = req.body;
@@ -60,6 +66,24 @@ app.post("/shorten", async (req, res) => {
     } catch (err) {
         console.error("Error creating short URL:", err);
         res.status(500).json({ error: "Internal server error" });
+    }
+});
+
+// URL redirection for shortened links
+app.get("/:shortUrl", async (req, res) => {
+    const { shortUrl } = req.params;
+    try {
+        const url = await Url.findOne({ shortUrl });
+
+        if (!url) {
+            return res.status(404).send("URL not found");
+        }
+
+        // Redirect to the original URL
+        res.redirect(url.originalUrl);
+    } catch (err) {
+        console.error("Error redirecting:", err);
+        res.status(500).send("Internal Server Error");
     }
 });
 
