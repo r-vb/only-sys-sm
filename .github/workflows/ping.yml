@@ -7,10 +7,9 @@ on:
 jobs:
   ping_websites:
     runs-on: ubuntu-latest
+    steps:
+      - name: Ping shotme.cc
+        run: curl -s https://shotme.cc || echo "Failed to ping https://shotme.cc"
 
-  steps:
-    - name: Ping shotme.cc
-      run: curl -s https://shotme.cc || echo "Failed to ping https://shotme.cc"
-
-    - name: Ping smad.cc
-      run: curl -s https://smad.cc || echo "Failed to ping https://smad.cc"
+      - name: Ping smad.cc
+        run: curl -s https://smad.cc || echo "Failed to ping https://smad.cc"
