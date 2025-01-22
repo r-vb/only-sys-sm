@@ -16,7 +16,7 @@ function App() {
                 alias: alias.trim() || null,
                 domain,
             });
-            setShortUrl(`${domain}/${response.data.shortUrl}`);
+            setShortUrl(`${response.data.domain}/${response.data.shortUrl}`);
             setError("");
         } catch (err) {
             setError(err.response?.data?.error || "Something went wrong");
@@ -46,7 +46,11 @@ function App() {
                 </select>
                 <button type="submit">Shorten</button>
             </form>
-            {shortUrl && <p>Short URL: <a href={`https://${shortUrl}`}>{`https://${shortUrl}`}</a></p>}
+            {shortUrl && (
+                <p>
+                    Short URL: <a href={`https://${shortUrl}`} target="_blank" rel="noopener noreferrer">{shortUrl}</a>
+                </p>
+            )}
             {error && <p style={{ color: "red" }}>{error}</p>}
         </div>
     );
