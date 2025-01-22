@@ -7,12 +7,9 @@ const WebSocket = require("ws");
 const app = express();
 
 // MongoDB connection setup
-mongoose.connect("mongodb+srv://rahulvb27:QhVxdVXegfJQrthF@r1cluster27.cel5auk.mongodb.net/test", {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-});
-const db = mongoose.connection;
-db.on("error", console.error.bind(console, "MongoDB connection error:"));
+mongoose.connect("mongodb+srv://rahulvb27:QhVxdVXegfJQrthF@r1cluster27.cel5auk.mongodb.net/test")
+    .then(() => console.log("MongoDB connected"))
+    .catch(err => console.error("MongoDB connection error:", err));
 
 // URL schema and model
 const urlSchema = new mongoose.Schema({
@@ -66,8 +63,8 @@ app.post("/shorten", async (req, res) => {
     }
 });
 
-// WebSocket server setup
-const wss = new WebSocket.Server({ port: 10000 });
+// WebSocket server setup with a new port
+const wss = new WebSocket.Server({ port: 10001 });  // Changed port from 10000 to 10001
 wss.on("connection", (ws) => {
     console.log("WebSocket client connected");
 
