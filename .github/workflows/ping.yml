@@ -2,13 +2,15 @@ name: Keep Websites Awake
 
 on:
   schedule:
-    - cron: "*/1 * * * *"  # Runs every 5 minutes
+    - cron: "*/1 * * * *"  # Runs every 1 minute
 
 jobs:
   ping_websites:
     runs-on: ubuntu-latest
-    steps:
-      - name: Ping shotme.cc
-        run: curl -s https://shotme.cc || echo "Failed to ping https://shotme.cc"
-      - name: Ping smad.cc
-        run: curl -s https://smad.cc || echo "Failed to ping https://smad.cc"
+
+  steps:
+    - name: Ping shotme.cc
+      run: curl -s https://shotme.cc || echo "Failed to ping https://shotme.cc"
+
+    - name: Ping smad.cc
+      run: curl -s https://smad.cc || echo "Failed to ping https://smad.cc"
