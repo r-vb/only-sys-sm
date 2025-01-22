@@ -53,9 +53,9 @@ app.post("/shorten", async (req, res) => {
         await newUrl.save();
 
         res.json({
-            shortUrl: `${domain}/${shortUrl}`,
+            shortUrl: `${shortUrl}`,  // Send only the alias
+            domain,                   // Send the domain part
             originalUrl,
-            domain,
         });
     } catch (err) {
         console.error("Error creating short URL:", err);
