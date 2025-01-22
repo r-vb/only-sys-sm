@@ -33,17 +33,110 @@ app.use((req, res, next) => {
     next();
 });
 
+// Serve a basic HTML page with your custom template
+app.get("/", (req, res) => {
+    res.send(`
+        <html>
+            <head>
+                <title>SMAD | Shotme's Parent Company</title>
+                <meta name="description" content="SMAD - Shotme's Parent Company" />
+                <link rel="icon" href="/logo-smad.png" />
+                <!-- Include FontAwesome for the circle icon -->
+                <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
+                <style>
+                    /* General styles for the page */
+                    .container {
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        height: 100vh;
+                        background-color: #000;
+                    }
+
+                    /* Embossed text styles */
+                    .embossedText {
+                        font-size: 5rem;
+                        color: #fff;
+                        font-weight: bold;
+                        text-transform: uppercase;
+                        text-align: center;
+                        position: relative;
+                        letter-spacing: 5px;
+                        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+                        text-shadow: 
+                            2px 2px 4px rgba(0, 0, 0, 0.4), 
+                            -2px -2px 4px rgba(0, 0, 0, 0.4),
+                            4px 4px 6px rgba(0, 0, 0, 0.2);
+                    }
+
+                    /* Dot styling */
+                    .dot {
+                        color: #cba921;
+                        display: inline-flex;
+                        align-items: center;
+                        height: 1.5rem;
+                        width: 1.5rem;
+                        border-radius: 50%;
+                        margin: 0 5px;
+                        line-height: 0;
+                    }
+
+                    .dot i {
+                        font-size: 1rem;
+                    }
+
+                    /* Emboss effect for the text */
+                    .embossedText::before,
+                    .embossedText::after {
+                        content: "S H O T M E  [dot] C C";
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        color: rgba(255, 255, 255, 0.2);
+                        z-index: -1;
+                        transform: translate(4px, 4px);
+                    }
+
+                    .embossedText::after {
+                        transform: translate(-4px, -4px);
+                    }
+
+                    /* Mobile responsiveness */
+                    @media (max-width: 768px) {
+                        .embossedText {
+                            font-size: 3rem;
+                            letter-spacing: 3px;
+                        }
+                    }
+
+                    @media (max-width: 480px) {
+                        .embossedText {
+                            font-size: 2.5rem;
+                            letter-spacing: 2px;
+                        }
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="embossedText">
+                        S M A D<span class="dot"><i class="fas fa-circle"></i></span>C C
+                    </div>
+                </div>
+            </body>
+        </html>
+    `);
+});
+
 // API Endpoint for URL shortening
 app.post("/shorten", async (req, res) => {
     const { originalUrl, alias, domain } = req.body;
 
     try {
-        // Validate input
         if (!originalUrl || !domain) {
             return res.status(400).json({ error: "Original URL and domain are required" });
         }
 
-        // Check if alias already exists for the domain
         if (alias) {
             const existingAlias = await Url.findOne({ shortUrl: alias, domain });
             if (existingAlias) {
@@ -51,16 +144,13 @@ app.post("/shorten", async (req, res) => {
             }
         }
 
-        // Generate or use provided alias for the short URL
         const shortUrl = alias || shortid.generate();
-
-        // Save the new shortened URL to the database
         const newUrl = new Url({ originalUrl, shortUrl, domain });
         await newUrl.save();
 
         res.json({
-            shortUrl: `${shortUrl}`,  // Send only the alias
-            domain,                   // Send the domain part
+            shortUrl: `${shortUrl}`,
+            domain,
             originalUrl,
         });
     } catch (err) {
@@ -74,12 +164,9 @@ app.get("/:shortUrl", async (req, res) => {
     const { shortUrl } = req.params;
     try {
         const url = await Url.findOne({ shortUrl });
-
         if (!url) {
             return res.status(404).send("URL not found");
         }
-
-        // Redirect to the original URL
         res.redirect(url.originalUrl);
     } catch (err) {
         console.error("Error redirecting:", err);
@@ -88,7 +175,7 @@ app.get("/:shortUrl", async (req, res) => {
 });
 
 // WebSocket server setup with a new port
-const wss = new WebSocket.Server({ port: 10001 });  // Changed port from 10000 to 10001
+const wss = new WebSocket.Server({ port: 10001 });
 wss.on("connection", (ws) => {
     console.log("WebSocket client connected");
 
